@@ -5,9 +5,9 @@
 
 @import url('https://fonts.googleapis.com/css?family=Merriweather');
 
-$primary-color        : #2171b5;
+$primary-color        : #C6CB4E;
 $secondary-color      : #ffffff;
-$key-color            : #d66bc4;
+$key-color            : #2171b5;
  
 :root, * {
   box-sizing          : border-box;
@@ -16,29 +16,51 @@ $key-color            : #d66bc4;
 }
 
 body {
-  background          : $secondary-color;
+  background          : $key-color; 
+  background          : repeating-linear-gradient(
+                        45deg,
+                        lighten( $key-color, 4% ),
+                        lighten( $key-color, 4% ) 5px,
+                        $key-color 5px,
+                        $key-color 10px
+                      );
   color               : $primary-color;
   font-family         : 'Merriweather', serif;
-  padding             : 1rem;
   display             : flex;
   flex-direction      : column; 
   justify-content     : center;
   align-items         : center; 
 }
 
+hr {
+  border              : 0;
+  width               : 100%;
+  padding-top         : 1rem;
+  border-bottom       : 1px solid rgba( $secondary-color, .3 );
+}
+
+a, a:visited {
+  color             : $secondary-color;
+  text-decoration   : none;
+  transition        : color 300ms;
+
+  &:hover, &:active {
+    color           : $primary-color;
+  }
+}
+
 #heading {
-  padding-top         : 2rem;
+  padding             : 3rem 2rem 0 2rem;
+  width               : 100%;
+  text-align          : left;
 
   #title {
     font-size         : 2rem;
-    text-align        : center;
-    padding           : 1rem;
   }
 
   #description {
     font-size         : 1rem;
-    text-align        : center;
-    color             : $key-color;
+    color             : rgba( $secondary-color, .7 );
   }
 
 }
@@ -46,9 +68,6 @@ body {
 #chart-container {
   width               : 100%;
   max-width           : 1600px;
-  padding             : 0 1.5rem;
-  margin              : 2rem 0;
-  background          : $secondary-color; 
   position            : relative;
   display             : flex;
   flex-direction      : column;
@@ -58,7 +77,7 @@ body {
   #preloader {
     position          : absolute;
     transition        : opacity 300ms;
-    color             : $key-color;
+    color             : $primary-color;
     animation         : blink 1s infinite;
     @keyframes blink {
       0%   { opacity  :  1; }
@@ -81,42 +100,61 @@ body {
     
     .state {
       fill            : none;
-      stroke          : $secondary-color;
+      stroke          : $key-color;
       stroke-width    : 0.5px;
       stroke-linejoin : round;
       stroke-linecap  : round;
       pointer-events  : none;
     }
   }
+
+  .source {
+    width             : 100%;
+    text-align        : center;
+    font-size         : .8rem; 
+    color             : rgba( $secondary-color, .5 );
+  }
 }
 
 #tooltip {
   pointer-events      : none;
-  background          : $primary-color;
-  border              : 3px solid $primary-color;
-  border-radius       : 10px;
+  background          : $key-color;
+  background          : repeating-linear-gradient(
+                        45deg,
+                        lighten( $key-color, 4% ),
+                        lighten( $key-color, 4% ) 5px,
+                        $key-color 5px,
+                        $key-color 10px
+                      );
+  border              : 3px dashed $secondary-color;
   box-shadow          : 0px 0px 20px 5px rgba(black,.2);
-  color               : $primary-color;
+  color               : rgba( $secondary-color, .7 );
   text-align          : left;
   font-size           : 1rem;
   max-width           : 400px;
   display             : flex;
   flex-direction      : column;
+  transition          : opacity 300ms;
 
   .title {
-    padding           : 1rem;
+    padding           : 1rem 1rem 0 1rem;
     height            : 100% !important;
+    font-size         : 1.4rem; 
     text-shadow       : 2px 2px 5px rgba( black, .2 );
     text-align        : center;
-    color             : $secondary-color;
+    color             : $primary-color;
+    hr {
+      width             : 100%;
+      padding-top       : 1rem;
+      border-bottom     : 1px dashed $secondary-color;
+    }
   }
 
   .desc {
     pointer-events    : none;
     padding           : 1rem;
     line-height       : 1.8rem;
-    background        : $secondary-color;
-    border-radius     : 10px;
+    text-align        : center; 
   }
 
 }
@@ -125,25 +163,10 @@ body {
 footer {
   text-align          : center;
   width               : 50%;
+  color               : rgba( $secondary-color, .5 );
 
   p {
     margin            : 1rem 0;
-  }
-
-  hr {
-    border            : 0;
-    height            : 0;
-    border-bottom     : 1px solid rgba( $primary-color, .3 );
-  }
-
-  a, a:visited {
-    color             : $key-color;
-    text-decoration   : none;
-    transition        : color 300ms;
-
-    &:hover, &:active {
-      color           : $primary-color;
-    }
   }
 
 }

@@ -135,7 +135,10 @@ class ChartBuilder {
         area     : activeCounty.attr( 'data-area' )
       }
       const tipText = `
-        <h4 class="title">${activeCounty.area} (${activeCounty.state})</h4>
+        <h4 class="title">
+          ${activeCounty.area} (${activeCounty.state})
+          <hr />
+        </h4>
         <div class="desc">
           <p>
             In <b>${activeCounty.area} (${activeCounty.state})</b>, 

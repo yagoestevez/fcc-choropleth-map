@@ -12,12 +12,15 @@
 </head>
 
 <body>
-  <h2 id="title">United States Educational Attainment</h2>
-  <h3 id="description">Percentage of adults (25 and older) with a bachelor's degree or higher (2010-2014)</h3>
-  <div id="preloader">
-    Loading data. Please wait.
-  </div>
+  <header id="heading">
+    <h2 id="title">United States Educational Attainment</h2>
+    <h3 id="description">Percentage of adults (25 and older) with a bachelor's degree or higher (2010-2014)</h3>
+  </header>
+
   <div id="chart-container">
+    <div id="preloader">
+      Loading data. Please wait.
+    </div>
     <svg id="chart"></svg>
   </div>
   <footer>
@@ -34,6 +37,7 @@
 
   <script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
   <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="d3-tip.js"></script>
   <script src="https://unpkg.com/topojson@3"></script>
   <script src="bundle.js"></script>
 </body>

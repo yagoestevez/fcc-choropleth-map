@@ -7,6 +7,7 @@ require( './main.scss'               );
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 const API_URLs = [
   'https://raw.githubusercontent.com/no-stack-dub-sack/testable-projects-fcc/master/src/data/choropleth_map/counties.json',
   'https://raw.githubusercontent.com/no-stack-dub-sack/testable-projects-fcc/master/src/data/choropleth_map/for_user_education.json'
@@ -21,7 +22,7 @@ Promise.all( API_URLs.map( url =>
   document.getElementById( 'preloader' ).classList.add( 'hidden' ); 
   // Builds the Choropleth Map.
   const getTheChart = new ChartBuilder( data );
-  getTheChart.makeCanvas().drawMap().paintColor();
+  getTheChart.makeCanvas().drawMap().paintColor().setTooltip().and.handleEvents();
 } )
 .catch( error => { throw new Error( error ) } );
 
@@ -30,9 +31,9 @@ class ChartBuilder {
 
   constructor ( data ) {
     // Sets up sizes.
-    this.chartWidth  = 1000;
+    this.chartWidth  = 1100;
     this.chartHeight = 700;
-    this.margin      = { top: 30, bottom: 30, left: 30, right: 30 };
+    this.margin      = { top: 60, bottom: 60, left: 60, right: 60 };
     this.innerWidth  = this.chartWidth  - this.margin.left - this.margin.right;
     this.innerHeight = this.chartHeight - this.margin.top  - this.margin.bottom;
 
@@ -42,6 +43,9 @@ class ChartBuilder {
 
     // Cleans up the data.
     this.data        = this.cleanUpData( );
+
+    // Chains methods after instantiating.
+    this.and         = this;
   }
 
   // Cleans up the data.
@@ -64,7 +68,8 @@ class ChartBuilder {
   // Creates the canvas for the chart.
   makeCanvas ( ) {
     this.chart = d3.select( '#chart' )
-      .attr( 'viewBox' , `0 0 ${this.chartWidth} ${this.chartHeight}` );
+      .attr( 'viewBox' , `0 0 ${this.chartWidth} ${this.chartHeight}` )
+      .attr( 'preserveAspectRatio', 'xMidYMid meet' );
     this.canvas = this.chart.append( 'g' )
       .attr( 'transform', `translate( ${this.margin.left}, ${this.margin.top} )` );
     return this;
@@ -72,19 +77,22 @@ class ChartBuilder {
 
   drawMap ( ) {  
     const geoPath = d3.geoPath( );
+
     // Draws the US map divided by counties.
-    this.map = this.canvas.selectAll( 'path' )
+    this.county = this.canvas.selectAll( 'path' )
       .data( topojson.feature( this.counties, this.counties.objects.counties ).features )
       .enter( )
       .append( 'path' )
         .attr( 'd'             , geoPath )
         .attr( 'class'         , 'county' )
         .attr( 'data-fips'     , d => d.id )
-        .attr( 'data-education', d => this.data.find( data => data.id === d.id ).bachelor );
+        .attr( 'data-education', d => this.data.find( data => data.id === d.id ).bachelor )
+        .attr( 'data-area'     , d => this.data.find( data => data.id === d.id ).area )
+        .attr( 'data-state'    , d => this.data.find( data => data.id === d.id ).state );
 
     // Overlays the US state borders.
     this.canvas.append("path")
-      .attr( 'class', 'states' )
+      .attr( 'class', 'state' )
       .attr( 'd'    , geoPath( topojson.mesh( this.counties, this.counties.objects.states ) ) );
 
     return this;
@@ -98,12 +106,54 @@ class ChartBuilder {
       ] )
       .domain( d3.extent( this.data, d => d.bachelor ) );
 
-    this.map.attr( 'fill', d => {
+    this.county.attr( 'fill', d => {
       const bachelor = this.data.find( data => data.id === d.id ).bachelor;
       return this.color( bachelor );
     } );
 
     return this;
+  }
+
+  // Creates the tooltip to display when hover each county.
+  setTooltip ( ) {
+    this.tip = d3.tip( )
+      .attr( 'id', 'tooltip' )
+      .html( d => d );
+    this.canvas.call( this.tip );
+    return this;
+  }
+
+  // Sets up the event handlers for each county path.
+  handleEvents ( ) {
+    let _self = this;
+    this.county
+    .on( 'mouseover', function ( d,i ) {
+      let activeCounty = d3.select( this );
+      activeCounty = {
+        education: activeCounty.attr( 'data-education' ),
+        state    : activeCounty.attr( 'data-state' ),
+        area     : activeCounty.attr( 'data-area' )
+      }
+      const tipText = `
+        <h4 class="title">${activeCounty.area} (${activeCounty.state})</h4>
+        <div class="desc">
+          <p>
+            In <b>${activeCounty.area} (${activeCounty.state})</b>, 
+            ${activeCounty.education < 20 ? 'only' : '' } around 
+            <b>${activeCounty.education}%</b> adults (<em>25yo and older</em>) 
+            have a bachelor's degree or higher.
+          </p>
+        </div>
+      `;
+      const browserWidth = document.querySelector( 'html' ).clientWidth;
+      _self.tip.attr( 'data-education', activeCounty.education )
+               .direction( d3.event.x < browserWidth / 2 ? 'e' : 'w' )
+               .offset( d3.event.x < browserWidth / 2 ? [ 0, 50 ] : [ 0, -50 ] )
+               .show( tipText );
+    } )
+    .on( 'mouseout', function ( d,i ) {
+      _self.tip.hide( );
+    } );
   }
 
 }

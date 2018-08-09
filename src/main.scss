@@ -43,10 +43,8 @@ body {
 
 
 .counties {
-  fill                : $primary-color;
-  stroke              : $primary-color;
   &:hover {
-    fill              : $secondary-color;
+    fill              : $key-color;
   }
 }
 

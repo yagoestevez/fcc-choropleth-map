@@ -21,7 +21,7 @@ Promise.all( API_URLs.map( url =>
   document.getElementById( 'preloader' ).classList.add( 'hidden' ); 
   // Builds the Choropleth Map.
   const getTheChart = new ChartBuilder( data );
-  getTheChart.makeCanvas().drawMap();
+  getTheChart.makeCanvas().drawMap().paintColor();
 } )
 .catch( error => { throw new Error( error ) } );
 
@@ -39,6 +39,26 @@ class ChartBuilder {
     // Saves the data.
     this.counties    = data[0];
     this.education   = data[1];
+
+    // Cleans up the data.
+    this.data        = this.cleanUpData( );
+  }
+
+  // Cleans up the data.
+  cleanUpData ( ) {
+    const newData = [ ];
+    this.counties.objects.counties.geometries.map( ( county, c_index ) => {
+      this.education.map( edu => {
+        if ( county.id !== edu.fips ) return;
+        newData.push( {
+          id       : edu.fips,
+          area     : edu.area_name,
+          state    : edu.state,
+          bachelor : edu.bachelorsOrHigher
+        } );
+      } );
+    } );
+    return newData;
   }
 
   // Creates the canvas for the chart.
@@ -50,27 +70,40 @@ class ChartBuilder {
     return this;
   }
 
-  drawMap ( ) {
+  drawMap ( ) {  
     const geoPath = d3.geoPath( );
+    // Draws the US map divided by counties.
     this.map = this.canvas.selectAll( 'path' )
       .data( topojson.feature( this.counties, this.counties.objects.counties ).features )
       .enter( )
       .append( 'path' )
-      .attr( 'd', geoPath )
-      .attr( 'class', 'counties' )
-      .attr( 'data-fips', d => d.id )
-      // .attr( 'data-education', d => {
-      //   const result = education.filter( obj => obj.fips === d.id );
-      //   return result[0] ? result[0].bachelorsOrHigher : false;
-      // } );
-      // .attr( 'fill', d => { 
-      //   const result = education.filter( obj => obj.fips === d.id );
-      //   return result[0] ? color(result[0].bachelorsOrHigher) : color( 0 );
-      // } );
-    // Draws state borders.
+        .attr( 'd'             , geoPath )
+        .attr( 'class'         , 'county' )
+        .attr( 'data-fips'     , d => d.id )
+        .attr( 'data-education', d => this.data.find( data => data.id === d.id ).bachelor );
+
+    // Overlays the US state borders.
     this.canvas.append("path")
       .attr( 'class', 'states' )
-      .attr( 'd', geoPath( topojson.mesh( this.counties, this.counties.objects.states, (a,b) => a !== b ) ) );
+      .attr( 'd'    , geoPath( topojson.mesh( this.counties, this.counties.objects.states ) ) );
+
+    return this;
+  }
+
+  // Paints the map with colors according to the data provided.
+  paintColor ( ) {
+    this.color = d3.scaleQuantize( )
+      .range( [
+        '#f7fbff','#deebf7','#c6dbef','#9ecae1','#6baed6','#4292c6','#2171b5','#08519c','#08306b'
+      ] )
+      .domain( d3.extent( this.data, d => d.bachelor ) );
+
+    this.map.attr( 'fill', d => {
+      const bachelor = this.data.find( data => data.id === d.id ).bachelor;
+      return this.color( bachelor );
+    } );
+
+    return this;
   }
 
 }

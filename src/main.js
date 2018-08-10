@@ -137,7 +137,7 @@ class ChartBuilder {
       .append( 'text' )
         .attr( 'x'     , ( d, i ) => ( i * 50 ) + 50 )
         .attr( 'y'     , 70 )
-        .text( ( d, i )=> ( start + ( i + 1 ) * step ).toFixed( 1 ) );
+        .text( ( d, i )=> ( start + ( i + 1 ) * step ).toFixed( 1 ) + '%' );
     legend.attr( 'transform', `translate( ${ this.chartWidth / 2 }, 0 )` );
 
     return this;

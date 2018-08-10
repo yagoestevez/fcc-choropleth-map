@@ -1,6 +1,7 @@
 # Visualize Data with a Choropleth Map
 #### Project made for the "Data Visualization" module in freeCodeCamp 
----
+
+![alt text](./Screenshot.png "Screenshot")
 
 This project was made for the 4th module in freeCodeCamp which requires the camper to code a Choropleth Map with D3.js representing the data taken from the [US Education Data](https://raw.githubusercontent.com/no-stack-dub-sack/testable-projects-fcc/master/src/data/choropleth_map/for_user_education.json) and the [US Country Data](https://raw.githubusercontent.com/no-stack-dub-sack/testable-projects-fcc/master/src/data/choropleth_map/counties.json) JSON documents.
 

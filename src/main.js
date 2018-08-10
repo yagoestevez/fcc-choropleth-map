@@ -22,7 +22,7 @@ Promise.all( API_URLs.map( url =>
   document.getElementById( 'preloader' ).classList.add( 'hidden' ); 
   // Builds the Choropleth Map.
   const getTheChart = new ChartBuilder( data );
-  getTheChart.makeCanvas().drawMap().paintColor().setTooltip().and.handleEvents();
+  getTheChart.makeCanvas().drawMap().paintColor().makeLegend().makeTooltip().and.handleEvents();
 } )
 .catch( error => { throw new Error( error ) } );
 
@@ -114,8 +114,37 @@ class ChartBuilder {
     return this;
   }
 
+  // Creates the legend items from the chart.
+  makeLegend ( ) {
+    const legend = this.chart.append( 'g' )
+      .attr( 'id', 'legend' );
+    legend.selectAll( 'rect' )
+      .data( this.color.range( ) )
+      .enter( )
+      .append( 'rect' )
+        .attr( 'class' , 'legend' )
+        .attr( 'width' , 50 )
+        .attr( 'height', 20 )
+        .attr( 'x'     , ( d, i ) => i * 50 )
+        .attr( 'y'     , 30 )
+        .attr( 'fill'  , d => d );
+
+    const start = this.color.domain( )[0];
+    const step  = ( this.color.domain( )[1] - this.color.domain( )[0] ) / this.color.range( ).length;
+    legend.selectAll( 'text' )
+      .data( this.color.range( ) )
+      .enter( )
+      .append( 'text' )
+        .attr( 'x'     , ( d, i ) => ( i * 50 ) + 50 )
+        .attr( 'y'     , 70 )
+        .text( ( d, i )=> ( start + ( i + 1 ) * step ).toFixed( 1 ) );
+    legend.attr( 'transform', `translate( ${ this.chartWidth / 2 }, 0 )` );
+
+    return this;
+  }
+
   // Creates the tooltip to display when hover each county.
-  setTooltip ( ) {
+  makeTooltip ( ) {
     this.tip = d3.tip( )
       .attr( 'id', 'tooltip' )
       .html( d => d );

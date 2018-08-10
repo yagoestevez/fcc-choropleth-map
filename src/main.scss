@@ -108,6 +108,17 @@ a, a:visited {
     }
   }
 
+  #legend {
+    rect {
+      stroke          : rgba( $secondary-color, .7 );
+    }
+    text {
+      fill            : rgba( $secondary-color, .7 );
+      font-size       : .8rem; 
+      text-anchor     : middle;
+    }
+  }
+
   .source {
     width             : 100%;
     text-align        : center;
